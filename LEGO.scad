@@ -194,13 +194,14 @@ dual_bottom = "no"; // [no:No, yes:Yes]
 use_reinforcement = "no"; // [no:No, yes:Yes]
 
 // If your printer prints the blocks correctly except for the stud diameter, use this variable to resize just the studs for your printer. A value of 1.05 will print the studs 105% wider than standard.
-//stud_rescale = 1.00; // [0.51:0.01:1.49]
+stud_rescale = 1.00; // [0.51:0.01:1.49]
 //stud_rescale = 1.03 * 1;  // Creality Ender 3 Pro, PLA
 //stud_rescale = 1.0475 * 1; // Orion Delta, T-Glase
 //stud_rescale = 1.022 * 1; // Orion Delta, ABS
-stud_rescale = 1.05;
+//stud_rescale = 1.05;
 // Rescale factor to resize the splines length on the walls. A value of 0.9 will print the walls splines with 90% of the standard length.
-wall_splines_rescale = 1.3;
+wall_splines_rescale = 1.0;
+//wall_splines_rescale = 1.3;
 //wall_splines_rescale = 0.3; // Bambu Lab A1 Mini, PETG
 
 // If you want stud tops to be curved, specify a value between 0 and 1, where 0 is no roundness and 1 is very round

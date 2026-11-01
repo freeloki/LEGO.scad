@@ -194,13 +194,13 @@ dual_bottom = "no"; // [no:No, yes:Yes]
 use_reinforcement = "no"; // [no:No, yes:Yes]
 
 // If your printer prints the blocks correctly except for the stud diameter, use this variable to resize just the studs for your printer. A value of 1.05 will print the studs 105% wider than standard.
-stud_rescale = 1.00; // [0.51:0.01:1.49]
+//stud_rescale = 1.00; // [0.51:0.01:1.49]
 //stud_rescale = 1.03 * 1;  // Creality Ender 3 Pro, PLA
 //stud_rescale = 1.0475 * 1; // Orion Delta, T-Glase
 //stud_rescale = 1.022 * 1; // Orion Delta, ABS
-
+stud_rescale = 1.05;
 // Rescale factor to resize the splines length on the walls. A value of 0.9 will print the walls splines with 90% of the standard length.
-wall_splines_rescale = 1.00;
+wall_splines_rescale = 1.3;
 //wall_splines_rescale = 0.3; // Bambu Lab A1 Mini, PETG
 
 // If you want stud tops to be curved, specify a value between 0 and 1, where 0 is no roundness and 1 is very round
@@ -615,27 +615,28 @@ module block(
                     }
                     
                     
-                                        // 1 dim reinforcements fix start.
-                    
-                                      if (type != "baseplate" && block_bottom_type == "open" && (real_width == 1 || real_length == 1) && !real_dual_sided && roof_thickness < block_height * height) {
-                        // Reinforcements and posts
-                        translate([post_diameter / 2, post_diameter / 2, 0]) {
-                            translate([(overall_length - total_posts_length)/2, (overall_width - total_posts_width)/2, 0]) {
-                                union() {
-                                    // Reinforcements
-                                    if (real_reinforcement) {
-                                        difference() {
-                                            for (ycount=[1:real_width/2]) {
-                                                for (xcount=[1:real_length-1]) {
-                                                    translate([(xcount-1)*stud_spacing,(ycount-1)*stud_spacing,0]) reinforcement_single();
-                                                }
-                                            }
-                                        }
+   // 1-dimension reinforcements (1xN / Nx1)
+                     if (type != "baseplate" && block_bottom_type == "open" && (real_width == 1 || real_length == 1) && real_width != real_length && !real_dual_sided && roof_thickness < block_height * height) {
+                         if (real_reinforcement) {
+                             if (real_width == 1) {
+                                 // Place reinforcements between studs along the length
+                                 translate([stud_spacing - wall_play, overall_width/2, 0]) {
+                                     for (xcount=[1:real_length-1]) {
+                                         translate([(xcount-1)*stud_spacing, 0, 0]) reinforcement_single();
+                                     }
+                                 }
+                             } else {
+                                 // Place reinforcements between studs along the width
+                                 translate([overall_length/2, stud_spacing - wall_play, 0]) {
+                                     for (ycount=[1:real_width-1]) {
+                                         translate([0, (ycount-1)*stud_spacing, 0]) rotate([0, 0, 90]) reinforcement_single();
+                                     }
+                                 
                                     }
                                 }
                             }
                         }
-                    }
+                    
                     
                     
                     
@@ -1178,14 +1179,10 @@ module block(
         }
     }
     
-   module reinforcement_single() {
-        union() {
-            translate([0,0,real_height*block_height/2]) union() {
-                cube([reinforcing_width, 1 * (stud_spacing - (2 * wall_play)), block_height_ratio * block_height],center=true);
-                rotate(v=[0,0,1],a=90) cube([reinforcing_width, 0 * (stud_spacing - (2 * wall_play)), real_height * block_height], center=true);
-            }
-        }
-    }
+     module reinforcement_single() {
+         translate([0, 0, real_height*block_height/2])
+             cube([reinforcing_width, stud_spacing - (2 * wall_play), real_height * block_height], center=true);
+     }
 
     module axle_hole(shape, depth) {
         if (shape == "cross") {
